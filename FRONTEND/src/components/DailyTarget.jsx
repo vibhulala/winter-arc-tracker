@@ -1,18 +1,10 @@
-import { useState } from 'react'
-
-function DailyTarget({ name }) {
-  const [completed, setCompleted] = useState(false)
-
-  const handleToggle = () => {
-    setCompleted(!completed)
-  }
-
+function DailyTarget({ name, completed, onToggle }) {
   return (
     <div>
       <input
         type="checkbox"
         checked={completed}
-        onChange={handleToggle}
+        onChange={onToggle}
       />
 
       <h2>{name}</h2>
@@ -20,10 +12,10 @@ function DailyTarget({ name }) {
       <p>
         {completed
           ? 'Target Completed! 🎉'
-          : 'Complete today\'s target'}
+          : "Complete today's target"}
       </p>
 
-      <button onClick={handleToggle}>
+      <button onClick={onToggle}>
         {completed ? 'Mark Incomplete' : 'Mark Complete'}
       </button>
     </div>

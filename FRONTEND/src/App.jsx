@@ -1,132 +1,77 @@
-import DailyTarget from './components/DailyTarget'
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import DailyTarget from './components/DailyTarget'
 import './App.css'
-const targets = [
-  'DSA Practice',
-  'Workout',
-  'Study',
-  'Reading',
-  'Drink Water',
-  'Meditation'
-]
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [targets, setTargets] = useState([
+    {
+      id: 1,
+      name: 'DSA Practice',
+      completed: false
+    },
+    {
+      id: 2,
+      name: 'Workout',
+      completed: false
+    },
+    {
+      id: 3,
+      name: 'Study',
+      completed: false
+    },
+    {
+      id: 4,
+      name: 'Reading',
+      completed: false
+    },
+    {
+      id: 5,
+      name: 'Drink Water',
+      completed: false
+    }
+  ])
+
+  const handleToggle = (id) => {
+    setTargets(
+      targets.map((target) =>
+        target.id === id
+          ? { ...target, completed: !target.completed }
+          : target
+      )
+    )
+  }
+  {/* Ye sirf completed targets ko select karega. */}
+  const completedCount = targets.filter(
+  (target) => target.completed
+).length
+  const progressPercentage =
+  targets.length === 0
+    ? 0
+    : Math.round((completedCount / targets.length) * 100)
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Winter Arc Tracker</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        {targets.map((target) => (
-        <DailyTarget key={target} name={target} />
-        ))}
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <h1>Winter Arc Tracker</h1>
+      <p>
+      Progress: {completedCount} / {targets.length} ({progressPercentage}%)
+      </p>
+      <div className="progress-bar">
+      <div
+      className="progress-fill"
+      style={{ width: `${progressPercentage}%` }}
+      ></div>
+      </div>
+      <p>Today's Targets</p>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      {targets.map((target) => (
+        <DailyTarget
+          key={target.id}
+          name={target.name}
+          completed={target.completed}
+          onToggle={() => handleToggle(target.id)}
+        />
+      ))}
+    </div>
   )
 }
 
