@@ -16,7 +16,9 @@ function DailyTarget({ name, completed, onToggle }) {
       </p>
 
       <button onClick={onToggle}>
-        {completed ? 'Mark Incomplete' : 'Mark Complete'}
+        {completed
+          ? 'Mark Incomplete'
+          : 'Mark Complete'}
       </button>
     </div>
   )
