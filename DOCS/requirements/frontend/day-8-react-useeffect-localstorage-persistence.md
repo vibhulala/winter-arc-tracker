@@ -815,7 +815,7 @@ Example:
 ```jsx
 try {
   const savedTargets =
-    localStorage.getItem('winterArcTargets')
+    localStgitorage.getItem('winterArcTargets')
 
   return savedTargets
     ? JSON.parse(savedTargets)

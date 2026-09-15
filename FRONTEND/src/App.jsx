@@ -49,7 +49,7 @@ function App() {
       return initialTargets
     }
   })
-
+  const [newTarget, setNewTarget] = useState('')
   useEffect(() => {
     localStorage.setItem(
       'winterArcTargets',
@@ -69,7 +69,26 @@ function App() {
       )
     )
   }
+  const handleAddTarget = (e) => {
+  e.preventDefault()
 
+  if (!newTarget.trim()) {
+    return
+  }
+
+  const newTargetObject = {
+    id: Date.now(),
+    name: newTarget.trim(),
+    completed: false
+  }
+
+  setTargets((prevTargets) => [
+    ...prevTargets,
+    newTargetObject
+  ])
+
+  setNewTarget('')
+}
   const completedCount = targets.filter(
     (target) => target.completed
   ).length
@@ -90,7 +109,18 @@ function App() {
         totalTargets={targets.length}
         progressPercentage={progressPercentage}
       />
+      <form className="add-target-form" onSubmit={handleAddTarget}>
+  <input
+    type="text"
+    placeholder="Enter a new target"
+    value={newTarget}
+    onChange={(e) => setNewTarget(e.target.value)}
+  />
 
+  <button type="submit">
+    Add Target
+  </button>
+</form>
       <p>Today's Targets</p>
 
       {targets.map((target) => (
