@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import DailyTarget from './components/DailyTarget'
-import './App.css'
 import ProgressBar from './components/ProgressBar'
+import './App.css'
 
 const initialTargets = [
   {
@@ -86,10 +86,11 @@ function App() {
       <h1>Winter Arc Tracker</h1>
 
       <ProgressBar
-      completedCount={completedCount}
-      totalTargets={targets.length}
-      progressPercentage={progressPercentage}
+        completedCount={completedCount}
+        totalTargets={targets.length}
+        progressPercentage={progressPercentage}
       />
+
       <p>Today's Targets</p>
 
       {targets.map((target) => (
