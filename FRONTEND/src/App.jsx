@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import DailyTarget from './components/DailyTarget'
 import ProgressBar from './components/ProgressBar'
 import './App.css'
+import Dashboard from './components/Dashboard'
 
 const initialTargets = [
   {
@@ -101,8 +102,11 @@ function App() {
         )
 
   return (
+    
     <div>
       <h1>Winter Arc Tracker</h1>
+      
+      <Dashboard />
 
       <ProgressBar
         completedCount={completedCount}
