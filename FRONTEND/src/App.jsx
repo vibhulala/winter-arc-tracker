@@ -70,6 +70,11 @@ function App() {
       )
     )
   }
+  const handleDeleteTarget = (id) => {
+  setTargets((prevTargets) =>
+    prevTargets.filter((target) => target.id !== id)
+  )
+}
   const handleAddTarget = (e) => {
   e.preventDefault()
 
@@ -104,9 +109,13 @@ function App() {
   return (
     
     <div>
+      <Dashboard
+  totalTargets={targets.length}
+  completedTargets={completedCount}
+  progressPercentage={progressPercentage}
+/>    
+
       <h1>Winter Arc Tracker</h1>
-      
-      <Dashboard />
 
       <ProgressBar
         completedCount={completedCount}
@@ -133,6 +142,7 @@ function App() {
           name={target.name}
           completed={target.completed}
           onToggle={() => handleToggle(target.id)}
+          onDelete={() => handleDeleteTarget(target.id)}
         />
       ))}
     </div>

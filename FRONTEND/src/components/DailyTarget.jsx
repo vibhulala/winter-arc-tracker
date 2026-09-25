@@ -1,25 +1,26 @@
-function DailyTarget({ name, completed, onToggle }) {
+function DailyTarget({
+  name,
+  completed,
+  onToggle,
+  onDelete
+}) {
   return (
-    <div>
+    <div className="daily-target">
+
       <input
         type="checkbox"
         checked={completed}
         onChange={onToggle}
       />
 
-      <h2>{name}</h2>
+      <span className={completed ? 'completed' : ''}>
+        {name}
+      </span>
 
-      <p>
-        {completed
-          ? 'Target Completed! 🎉'
-          : "Complete today's target"}
-      </p>
-
-      <button onClick={onToggle}>
-        {completed
-          ? 'Mark Incomplete'
-          : 'Mark Complete'}
+      <button onClick={onDelete}>
+        Delete
       </button>
+
     </div>
   )
 }

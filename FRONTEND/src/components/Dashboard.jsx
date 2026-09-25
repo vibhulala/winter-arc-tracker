@@ -1,9 +1,9 @@
-function Dashboard() {
-  const dashboardData = {
-    totalTargets: 5,
-    completedTargets: 3,
-    streak: 7
-  }
+function Dashboard({
+  totalTargets,
+  completedTargets,
+  progressPercentage
+}) {
+  const streak = 7
 
   return (
     <div className="dashboard">
@@ -15,17 +15,17 @@ function Dashboard() {
       <div className="summary-cards">
 
         <div className="summary-card">
-          <h2>{dashboardData.totalTargets}</h2>
+          <h2>{totalTargets}</h2>
           <p>Total Targets</p>
         </div>
 
         <div className="summary-card">
-          <h2>{dashboardData.completedTargets}</h2>
+          <h2>{completedTargets}</h2>
           <p>Completed</p>
         </div>
 
         <div className="summary-card">
-          <h2>{dashboardData.streak}</h2>
+          <h2>{streak}</h2>
           <p>Current Streak</p>
         </div>
 
@@ -35,12 +35,12 @@ function Dashboard() {
 
         <h2>Today's Progress</h2>
 
-        <p>60% completed</p>
+        <p>{progressPercentage}% completed</p>
 
         <div className="dashboard-progress-bar">
           <div
             className="dashboard-progress-fill"
-            style={{ width: '60%' }}
+            style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
 
