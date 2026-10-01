@@ -35,13 +35,12 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 # ALLOWED HOSTS
 # =========================================================
 
+DEBUG = False
+
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1,winter-arc-tracker-g5uh.onrender.com"
-    ).split(",")
-    if host.strip()
+    "winter-arc-tracker-g5uh.onrender.com",
+    "localhost",
+    "127.0.0.1",
 ]
 
 
