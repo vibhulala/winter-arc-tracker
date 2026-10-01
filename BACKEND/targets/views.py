@@ -385,7 +385,15 @@ def current_user(request):
 # STREAK API
 # =========================================================
 
+# =========================================================
+# STREAK API
+# =========================================================
+
 def streak_data(request):
+
+    # ---------------------------------------------------------
+    # Authentication
+    # ---------------------------------------------------------
 
     if not request.user.is_authenticated:
         return JsonResponse(
@@ -396,7 +404,7 @@ def streak_data(request):
     today = timezone.localdate()
 
     # ---------------------------------------------------------
-    # Get all targets of current user
+    # Get current user's targets
     # ---------------------------------------------------------
 
     targets = Target.objects.filter(
@@ -420,151 +428,36 @@ def streak_data(request):
             "best_streak": 0
         })
 
-    # ---------------------------------------------------------
-    # Get completion history
-    # ---------------------------------------------------------
-
-    completions = TargetCompletion.objects.filter(
-        target__user=request.user
-    ).select_related("target")
-
-    # ---------------------------------------------------------
-    # Group completion records by date
-    # ---------------------------------------------------------
-
-    daily_data = {}
-
-    for completion in completions:
-
-        date = completion.date
-
-        if date not in daily_data:
-            daily_data[date] = {
-                "completed": 0
-            }
-
-        if completion.completed:
-            daily_data[date]["completed"] += 1
-
-    # ---------------------------------------------------------
+    # =========================================================
     # TODAY
-    # ---------------------------------------------------------
+    # =========================================================
+    #
+    # IMPORTANT:
+    # Today's progress is calculated directly from Target.completed
+    # so that the UI and streak calculation always match.
+    # =========================================================
 
-    today_completed = daily_data.get(
-        today,
-        {"completed": 0}
-    )["completed"]
+    today_completed = targets.filter(
+        completed=True
+    ).count()
 
     today_percentage = round(
         (today_completed / today_total) * 100
     )
 
-    # ---------------------------------------------------------
-    # IMPORTANT:
-    # 100% completion is required for streak
-    # ---------------------------------------------------------
+    # 80% OR MORE = SUCCESSFUL DAY
+    today_success = today_percentage >= 80
 
-    today_success = (
-        today_completed == today_total
-    )
-
-    # ---------------------------------------------------------
-    # SUCCESSFUL DAYS
-    # ---------------------------------------------------------
-
-    successful_days = set()
-
-    for date, data in daily_data.items():
-
-        completed = data["completed"]
-
-        # A day is successful ONLY when
-        # ALL current targets are completed.
-
-        if completed == today_total:
-            successful_days.add(date)
-
-    # ---------------------------------------------------------
-    # CURRENT STREAK
-    # ---------------------------------------------------------
-
-    current_streak = 0
-
-    check_date = today
-
-    while check_date in successful_days:
-
-        current_streak += 1
-
-        check_date = check_date - timedelta(days=1)
-
-    # ---------------------------------------------------------
-    # BEST STREAK
-    # ---------------------------------------------------------
-
-    best_streak = 0
-    running_streak = 0
-
-    if successful_days:
-
-        sorted_days = sorted(successful_days)
-
-        previous_day = None
-
-        for date in sorted_days:
-
-            if previous_day is not None:
-
-                difference = (
-                    date - previous_day
-                ).days
-
-                if difference == 1:
-                    running_streak += 1
-                else:
-                    running_streak = 1
-
-            else:
-                running_streak = 1
-
-            best_streak = max(
-                best_streak,
-                running_streak
-            )
-
-            previous_day = date
-
-    # ---------------------------------------------------------
-    # RESPONSE
-    # ---------------------------------------------------------
-
-    return JsonResponse({
-
-        "today": str(today),
-
-        "today_completed": today_completed,
-
-        "today_total": today_total,
-
-        "today_percentage": today_percentage,
-
-        "today_success": today_success,
-
-        "current_streak": current_streak,
-
-        "best_streak": best_streak
-    })
-
-    # ---------------------------------------------------------
-    # Get all completion records of current user
-    # ---------------------------------------------------------
+    # =========================================================
+    # COMPLETION HISTORY
+    # =========================================================
 
     completions = TargetCompletion.objects.filter(
         target__user=request.user
     ).select_related("target")
 
     # ---------------------------------------------------------
-    # Group completion records by date
+    # Group historical completion records by date
     # ---------------------------------------------------------
 
     daily_data = {}
@@ -575,8 +468,8 @@ def streak_data(request):
 
         if date not in daily_data:
             daily_data[date] = {
-                "total": 0,
-                "completed": 0
+                "completed": 0,
+                "total": 0
             }
 
         daily_data[date]["total"] += 1
@@ -584,38 +477,28 @@ def streak_data(request):
         if completion.completed:
             daily_data[date]["completed"] += 1
 
-    # ---------------------------------------------------------
-    # Today's progress
-    # ---------------------------------------------------------
-
-    today_data = daily_data.get(
-        today,
-        {
-            "total": 0,
-            "completed": 0
-        }
-    )
-
-    today_completed = today_data["completed"]
-
-    today_total = targets.count()
-
-    if today_total > 0:
-        today_percentage = round(
-            (today_completed / today_total) * 100
-        )
-    else:
-        today_percentage = 0
-
-    today_success = today_percentage >= 80
-
-    # ---------------------------------------------------------
-    # Calculate successful days
-    # ---------------------------------------------------------
+    # =========================================================
+    # SUCCESSFUL DAYS
+    # =========================================================
 
     successful_days = set()
 
+    # ---------------------------------------------------------
+    # TODAY
+    # ---------------------------------------------------------
+
+    if today_success:
+        successful_days.add(today)
+
+    # ---------------------------------------------------------
+    # PREVIOUS DAYS
+    # ---------------------------------------------------------
+
     for date, data in daily_data.items():
+
+        # Today is already calculated from current targets
+        if date == today:
+            continue
 
         if data["total"] == 0:
             continue
@@ -624,12 +507,13 @@ def streak_data(request):
             data["completed"] / data["total"]
         ) * 100
 
+        # 80% OR MORE = SUCCESSFUL DAY
         if percentage >= 80:
             successful_days.add(date)
 
-    # ---------------------------------------------------------
+    # =========================================================
     # CURRENT STREAK
-    # ---------------------------------------------------------
+    # =========================================================
 
     current_streak = 0
 
@@ -641,9 +525,9 @@ def streak_data(request):
 
         check_date = check_date - timedelta(days=1)
 
-    # ---------------------------------------------------------
+    # =========================================================
     # BEST STREAK
-    # ---------------------------------------------------------
+    # =========================================================
 
     best_streak = 0
     running_streak = 0
@@ -657,12 +541,14 @@ def streak_data(request):
         for date in sorted_days:
 
             if previous_day is not None:
+
                 difference = (
                     date - previous_day
                 ).days
 
                 if difference == 1:
                     running_streak += 1
+
                 else:
                     running_streak = 1
 
@@ -676,16 +562,23 @@ def streak_data(request):
 
             previous_day = date
 
-    # ---------------------------------------------------------
-    # RESPONSE
-    # ---------------------------------------------------------
+    # =========================================================
+    # FINAL RESPONSE
+    # =========================================================
 
     return JsonResponse({
+
         "today": str(today),
+
         "today_completed": today_completed,
+
         "today_total": today_total,
+
         "today_percentage": today_percentage,
+
         "today_success": today_success,
+
         "current_streak": current_streak,
+
         "best_streak": best_streak
     })
